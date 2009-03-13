@@ -74,6 +74,8 @@ def say(text,level=0,group=""):
     sys.stdout.flush()
 
 
+
+
 smpp_command_id={}
 smpp_command_id["generic_nack"]         = 0x80000000
 smpp_command_id["bind_receiver"]        = 0x00000001
@@ -102,6 +104,18 @@ smpp_command_id["submit_multi_resp"]    = 0x80000021
 smpp_command_id["alert_notification"]   = 0x00000102
 smpp_command_id["data_sm"]              = 0x00000103
 smpp_command_id["data_sm_resp"]         = 0x80000103
+
+def get_smppclass_name(header):
+    for com in smpp_command_id:
+	if (header.command_id==smpp_command_id[com]):
+	    return com
+    return "unknown_reserved"
+
+def get_smppclass(name):
+    pck = __import__("sb_smpp")
+    cls = getattr(pck,name)
+    return cls
+
 
 smpp_statuses = {}
 smpp_statuses["ESME_ROK"] = 0x00000000

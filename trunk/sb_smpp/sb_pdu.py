@@ -87,7 +87,7 @@ class __sb_bind__(__sb_pdu_header__):
 	return res
 
     def pck(self):
-	return __head__()+__body__()
+	return self.__head__()+self.__body__()
 
     @classmethod
     def __reverce__(self,pck):
@@ -95,12 +95,12 @@ class __sb_bind__(__sb_pdu_header__):
 	pass
 
 
-class __sp_bind_resp__(__sb_pdu_header__):
-    def __init__(self,system_id,sc_interface_version=""):
+class __sb_bind_resp__(__sb_pdu_header__):
+    def __init__(self,system_id,sc_interface_version="",command_id=smpp_command_id["bind_transceiver_resp"]):
 	
 	self.system_id = system_id
 	self.sc_interface_version = sc_interface_version
-	__sb_pdu_header__.__init__(self,smpp_command_id["bind_transceiver_resp"],smpp_statuses["ESME_ROK"],0)
+	__sb_pdu_header__.__init__(self,command_id,smpp_statuses["ESME_ROK"],0)
 	
     def __body__(self):
 	res = to_c_octetstring(self.system_id,16)
@@ -113,7 +113,7 @@ class __sp_bind_resp__(__sb_pdu_header__):
 	    pdu_header = __sb_pdu_header__.__reverce__(pck)
 	pck = pck[16:]
 	system_id = get_c_octet_string(pck,16)
-	resp = __sp_bind_resp__(system_id,pck[len(system_id)+1:])    
+	resp = __sb_bind_resp__(system_id,pck[len(system_id)+1:])    
 	resp.__sb_pdu_header__ = pdu_header
 	return resp
 
