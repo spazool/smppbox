@@ -135,22 +135,26 @@ class __sb_bind_resp__(__sb_pdu_header__):
 	return res
  
     def pck(self):
-	return __head__()+__body__()
+	return self.__head__()+self.__body__()
 
 
-
-class __sb_unbind_resp__(__sb_pdu_header__):
-    def __init__(self,command_id=smpp_command_id["unbind_resp"]):
+# Базовый пакет для всех пакетов без тела или не распознанных
+class __sb_custom__(__sb_pdu_header__):
+    def __init__(self,command_id=smpp_command_id["unbind"],body=""):
+	self.body=body
 	__sb_pdu_header__.__init__(self,command_id,smpp_statuses["ESME_ROK"],0)
 	
     def __body__(self):
-	return ""
+	return self.body
 
     @classmethod
     def __reverce__(self,pck,pdu_header=None):
 	if (pdu_header==None):
 	    pdu_header = __sb_pdu_header__.__reverce__(pck)
-	resp = __sb_unbind_resp__()    
+	if (len(pck)>16):
+	    resp = __sb_custom__(body=pck[16:])    
+	else:
+	    resp = __sb_custom__() 
 	resp.__copy__(pdu_header)
 	return resp
 
@@ -161,32 +165,7 @@ class __sb_unbind_resp__(__sb_pdu_header__):
 	return res
  
     def pck(self):
-	return __head__()+__body__()
-
-
-class __sb_unbind__(__sb_pdu_header__):
-    def __init__(self,command_id=smpp_command_id["unbind"]):
-	__sb_pdu_header__.__init__(self,command_id,smpp_statuses["ESME_ROK"],0)
-	
-    def __body__(self):
-	return ""
-
-    @classmethod
-    def __reverce__(self,pck,pdu_header=None):
-	if (pdu_header==None):
-	    pdu_header = __sb_pdu_header__.__reverce__(pck)
-	resp = __sb_unbind__()    
-	resp.__copy__(pdu_header)
-	return resp
-
-    def __str__(self):
-	res = str(__sb_pdu_header__.__str__(self))
-	res += "BODY:\n"
-	res +="\thex:%s" % toHexString(self.__body__()) 
-	return res
- 
-    def pck(self):
-	return __head__()+__body__()
+	return self.__head__()+self.__body__()
 
 
 class __sb_generic_nack__(__sb_pdu_header__):
@@ -211,42 +190,69 @@ class __sb_generic_nack__(__sb_pdu_header__):
 	return res
  
     def pck(self):
-	return __head__()+__body__()
+	return self.__head__()+self.__body__()
 
-
-
-class __sb_enquire_link_resp__(__sb_pdu_header__):
-    def __init__(self,command_id=smpp_command_id["enquire_link_resp"]):
-	__sb_pdu_header__.__init__(self,command_id,smpp_statuses["ESME_ROK"],0)
+class __sb_submit_sm_resp__(__sb_pdu_header__):
+    def __init__(self,command_id=smpp_command_id["submit_sm_resp"],smpp_status=smpp_statuses["ESME_ROK"],message_id=0):
+	self.message_id = message_id
+	__sb_pdu_header__.__init__(self,command_id,smpp_status,0)
 	
     def __body__(self):
-	return ""
+	res = to_c_octetstring(self.message_id,65)
+	return res
 
     @classmethod
     def __reverce__(self,pck,pdu_header=None):
 	if (pdu_header==None):
 	    pdu_header = __sb_pdu_header__.__reverce__(pck)
-	resp = __sb_unbind_resp__()    
+	resp = __sb_submit_sm_resp__(message_id=get_c_octetstring(pck[16:],65))    
 	resp.__copy__(pdu_header)
 	return resp
 
     def __str__(self):
 	res = str(__sb_pdu_header__.__str__(self))
 	res += "BODY:\n"
+	res +="\tmessage_id:%s\n" % self.message_id
 	res +="\thex:%s" % toHexString(self.__body__()) 
 	return res
  
     def pck(self):
-	return __head__()+__body__()
+	return self.__head__()+self.__body__()
 
 
-class __sb_enquire_link__(__sb_pdu_header__):
-    def __init__(self,command_id=smpp_command_id["enquire_link"]):
-	__sb_pdu_header__.__init__(self,command_id,smpp_statuses["ESME_ROK"],0)
+
+class __sb_submit_sm__(__sb_pdu_header__):
+    def __init__(self,service_type="",source_addr_ton=1,source_addr_npi=1,source_addr="",\
+    dest_addr_ton=1,dest_addr_npi=1,destination_addr="",esm_class=0x00000000,protocol_id=0,\
+    priority_flag=0,schedule_delivery_time="",validity_period="",registered_delivery=0,\
+    replace_if_present_flag=0,data_coding=0x00000000,sm_default_msg_id=0,short_message="",optionals=""):
+	self.service_type=service_type
+	self.source_addr_ton=source_addr_ton
+	self.source_addr_npi=source_addr_npi
+	self.source_addr=source_addr
+	self.dest_addr_ton=dest_addr_ton
+	self.dest_addr_npi=dest_addr_npi
+	self.destination_addr=destination_addr
+	self.esm_class=esm_class
+	self.protocol_id=protocol_id
+	self.priority_flag=priority_flag
+	self.schedule_delivery_time=schedule_delivery_time
+	self.validity_period=validity_period
+	self.registered_delivery=registered_delivery
+	self.replace_if_present_flag=replace_if_present_flag
+	self.data_coding=data_coding
+	self.sm_default_msg_id=sm_default_msg_id
+	#self.sm_length=sm_length
+	self.short_message=short_message
+	self.optionals=""
+	__sb_pdu_header__.__init__(self,smpp_command_id["submit_sm"],smpp_statuses["ESME_ROK"],0)
 	
     def __body__(self):
-	return ""
-
+	return to_c_octetstring(self.service_type,6)+chr(self.source_addr_ton)+chr(self.source_addr_npi)+to_c_octetstring(self.source_addr,21)+\
+	chr(self.dest_addr_ton)+chr(self.dest_addr_npi)+to_c_octetstring(self.destination_addr,21)+chr(self.esm_class)+chr(self.protocol_id)+chr(self.priority_flag)+\
+	to_c_octetstring(self.schedule_delivery_time,17)+to_c_octetstring(self.validity_period,17)+chr(self.registered_delivery)+chr(self.replace_if_present_flag)+\
+	chr(self.data_coding)+chr(self.sm_default_msg_id)+chr(len(self.short_message))+self.short_message+self.optionals
+	
     @classmethod
     def __reverce__(self,pck,pdu_header=None):
 	if (pdu_header==None):
@@ -262,6 +268,4 @@ class __sb_enquire_link__(__sb_pdu_header__):
 	return res
  
     def pck(self):
-	return __head__()+__body__()
-
-
+	return self.__head__()+self.__body__()

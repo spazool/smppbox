@@ -18,13 +18,32 @@ class bind_transceiver(sb_pdu.__sb_bind__):
 	sb_pdu.__sb_bind__.__init__(self,system_id,password,system_type,interface_version,addr_ton,addr_npi,addr_range)
 
 class bind_transceiver_resp(sb_pdu.__sb_bind_resp__): pass
-class unbind_resp(sb_pdu.__sb_unbind_resp__): pass
-class unbind(sb_pdu.__sb_unbind__): pass
+
+class unbind_resp(sb_pdu.__sb_custom__): 
+    def __init__(self):
+	sb_pdu.__sb_custom__.__init__(self,command_id=smpp_command_id["unbind_resp"]) 
+	
+	
+class unbind(sb_pdu.__sb_custom__):
+    def __init__(self):
+	sb_pdu.__sb_custom__.__init__(self,command_id=smpp_command_id["unbind"]) 
+
 class generic_nack(sb_pdu.__sb_generic_nack__): pass
-class enquire_link_resp(sb_pdu.__sb_enquire_link_resp__): pass
-class enquire_link(sb_pdu.__sb_enquire_link__): pass
+
+class enquire_link_resp(sb_pdu.__sb_custom__):
+    def __init__(self):
+	sb_pdu.__sb_custom__.__init__(self,command_id=smpp_command_id["enquire_link_resp"]) 
+
+class enquire_link(sb_pdu.__sb_custom__):
+    def __init__(self):
+	sb_pdu.__sb_custom__.__init__(self,command_id=smpp_command_id["enquire_link"]) 
+    
+class submit_sm(sb_pdu.__sb_submit_sm__):  pass
+
+class submit_sm_resp(sb_pdu.__sb_submit_sm_resp__):  pass
     
 def class_from_pck(pck,path=""):
     header = sb_pdu.__sb_pdu_header__.__reverce__(pck)
     return  get_smppclass(get_smppclass_name(header),path).__reverce__(pck,header)
-    
+
+

@@ -21,10 +21,10 @@ def fromDWORD(s):
     return ord(s[3]) + (ord(s[2])<<8) + (ord(s[1])<<16) + (ord(s[0])<<24)
 
 def toWORD(i):
-    return ''.join(map(chr,[x&0xff for x in [i,i>>8]]))
+    return ''.join(map(chr,[x&0xff for x in [i>>8,i]]))
 
 def fromWORD(s):
-    return ord(s[0]) + (ord(s[1])<<8)
+    return ord(s[1]) + (ord(s[0])<<8)
 
 def toHexString(pck,spliter=" "):
     return spliter.join(["%02X" % ord(p) for p in pck ])
@@ -74,7 +74,30 @@ def say(text,level=0,group=""):
     sys.stdout.flush()
 
 
+# TLV (Tag, Length, Value) format
+#
+#   The Tag field is used to uniquely identify the particular optional parameter in 
+# question. (The optional parameter Tag field is always 2 octets in length.)
+#
+#   The Length field indicates the length of the Value field in octets. Note that this
+# length does not include the length of the Tag and Length fields. (The optional 
+# parameter Length field is always 2 octets in length.)
+#
+# The Value field contains the actual data for the optional parameter in question.
+class TLV:
+    def __init__(self,tag,value):
+	self.tag,self.value = tag,value
 
+    def __len__(self):
+	return len(self.value)
+    
+    def pck(self):
+	return toWORD(tag)+toWORD(len(self))+self.value
+
+    @classmethod
+    def __reverce__(self,pck):
+	return  TLV(fromWORD(pck[2:4]),pck[4:fromWORD(pck[0:2])-4])
+	
 
 smpp_command_id={}
 smpp_command_id["generic_nack"]         = 0x80000000
