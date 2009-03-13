@@ -113,8 +113,7 @@ def get_smppclass_name(header):
 
 def get_smppclass(name,path=""):
     pck = __import__(path+"sb_smpp")
-    print dir(pck)
-    cls = getattr(pck,name)
+    cls = getattr(pck.sb_smpp,name)
     return cls
 
 

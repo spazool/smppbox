@@ -24,7 +24,13 @@ class __sb_pdu_header__:
  
     def __head__(self):
 	return toDWORD(len(self))+toDWORD(self.command_id)+toDWORD(self.command_status_id)+toDWORD(self.sequence_number)
-
+    
+    def __copy__(self,header):
+	self.command_id = header.command_id
+	self.command_status_id = header.command_status_id
+	self.sequence_number = header.sequence_number
+	self.length = header.length
+	
     # Построение заголовков
     @classmethod
     def __reverce__(self,pck):
@@ -113,9 +119,11 @@ class __sb_bind_resp__(__sb_pdu_header__):
 	if (pdu_header==None):
 	    pdu_header = __sb_pdu_header__.__reverce__(pck)
 	pck = pck[16:]
-	system_id = get_c_octet_string(pck,16)
+	system_id = get_c_octetstring(pck,16)
 	resp = __sb_bind_resp__(system_id,pck[len(system_id)+1:])    
-	resp.__sb_pdu_header__ = pdu_header
+	#resp.__sb_pdu_header__ = pdu_header
+	resp.__copy__(pdu_header)
+	#print hEX(pdu_header.command_status_id),hEX(resp.command_status_id)
 	return resp
 
     def __str__(self):
@@ -128,3 +136,132 @@ class __sb_bind_resp__(__sb_pdu_header__):
  
     def pck(self):
 	return __head__()+__body__()
+
+
+
+class __sb_unbind_resp__(__sb_pdu_header__):
+    def __init__(self,command_id=smpp_command_id["unbind_resp"]):
+	__sb_pdu_header__.__init__(self,command_id,smpp_statuses["ESME_ROK"],0)
+	
+    def __body__(self):
+	return ""
+
+    @classmethod
+    def __reverce__(self,pck,pdu_header=None):
+	if (pdu_header==None):
+	    pdu_header = __sb_pdu_header__.__reverce__(pck)
+	resp = __sb_unbind_resp__()    
+	resp.__copy__(pdu_header)
+	return resp
+
+    def __str__(self):
+	res = str(__sb_pdu_header__.__str__(self))
+	res += "BODY:\n"
+	res +="\thex:%s" % toHexString(self.__body__()) 
+	return res
+ 
+    def pck(self):
+	return __head__()+__body__()
+
+
+class __sb_unbind__(__sb_pdu_header__):
+    def __init__(self,command_id=smpp_command_id["unbind"]):
+	__sb_pdu_header__.__init__(self,command_id,smpp_statuses["ESME_ROK"],0)
+	
+    def __body__(self):
+	return ""
+
+    @classmethod
+    def __reverce__(self,pck,pdu_header=None):
+	if (pdu_header==None):
+	    pdu_header = __sb_pdu_header__.__reverce__(pck)
+	resp = __sb_unbind__()    
+	resp.__copy__(pdu_header)
+	return resp
+
+    def __str__(self):
+	res = str(__sb_pdu_header__.__str__(self))
+	res += "BODY:\n"
+	res +="\thex:%s" % toHexString(self.__body__()) 
+	return res
+ 
+    def pck(self):
+	return __head__()+__body__()
+
+
+class __sb_generic_nack__(__sb_pdu_header__):
+    def __init__(self,command_id=smpp_command_id["generic_nack"],smpp_status=smpp_statuses["ESME_ROK"]):
+	__sb_pdu_header__.__init__(self,command_id,smpp_status,0)
+	
+    def __body__(self):
+	return ""
+
+    @classmethod
+    def __reverce__(self,pck,pdu_header=None):
+	if (pdu_header==None):
+	    pdu_header = __sb_pdu_header__.__reverce__(pck)
+	resp = __sb_unbind__()    
+	resp.__copy__(pdu_header)
+	return resp
+
+    def __str__(self):
+	res = str(__sb_pdu_header__.__str__(self))
+	res += "BODY:\n"
+	res +="\thex:%s" % toHexString(self.__body__()) 
+	return res
+ 
+    def pck(self):
+	return __head__()+__body__()
+
+
+
+class __sb_enquire_link_resp__(__sb_pdu_header__):
+    def __init__(self,command_id=smpp_command_id["enquire_link_resp"]):
+	__sb_pdu_header__.__init__(self,command_id,smpp_statuses["ESME_ROK"],0)
+	
+    def __body__(self):
+	return ""
+
+    @classmethod
+    def __reverce__(self,pck,pdu_header=None):
+	if (pdu_header==None):
+	    pdu_header = __sb_pdu_header__.__reverce__(pck)
+	resp = __sb_unbind_resp__()    
+	resp.__copy__(pdu_header)
+	return resp
+
+    def __str__(self):
+	res = str(__sb_pdu_header__.__str__(self))
+	res += "BODY:\n"
+	res +="\thex:%s" % toHexString(self.__body__()) 
+	return res
+ 
+    def pck(self):
+	return __head__()+__body__()
+
+
+class __sb_enquire_link__(__sb_pdu_header__):
+    def __init__(self,command_id=smpp_command_id["enquire_link"]):
+	__sb_pdu_header__.__init__(self,command_id,smpp_statuses["ESME_ROK"],0)
+	
+    def __body__(self):
+	return ""
+
+    @classmethod
+    def __reverce__(self,pck,pdu_header=None):
+	if (pdu_header==None):
+	    pdu_header = __sb_pdu_header__.__reverce__(pck)
+	resp = __sb_unbind__()    
+	resp.__copy__(pdu_header)
+	return resp
+
+    def __str__(self):
+	res = str(__sb_pdu_header__.__str__(self))
+	res += "BODY:\n"
+	res +="\thex:%s" % toHexString(self.__body__()) 
+	return res
+ 
+    def pck(self):
+	return __head__()+__body__()
+
+

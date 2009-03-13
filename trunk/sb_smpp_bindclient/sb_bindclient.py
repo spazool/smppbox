@@ -3,8 +3,8 @@
 
 import socket
 import threading,time
-import sb_smpp.sb_smpp as smpp
-from sb_smpp.smpputil import *
+import sb_smpp_sdk.sb_smpp as smpp
+from sb_smpp_sdk.smpputil import *
 
 class socket_bind_client(threading.Thread):
     def __init__(self,host,port,bufferSize=2048,recv_event=None):
@@ -28,18 +28,17 @@ class socket_bind_client(threading.Thread):
 		
 	
     def recv(self,pck):
-	print "<< "+toHexString(pck)
+	#print "<< "+toHexString(pck)
     	if(self.recv_event!=None):
 	    self.recv_event(pck)
 	
     def send(self,pck):
-	print ">> "+toHexString(pck)
+	#print ">> "+toHexString(pck)
 	self.sock.send(pck)
 
 
     def stop(self):
 	if (self.connected):
-	    print "Stoped"
 	    try:
 		self.connected = False
 		self.sock.shutdown(1)
@@ -65,7 +64,7 @@ class socket_bind_transceiver(threading.Thread):
 	    time.sleep(0.1)
 
     def recv(self,pck):
-	cl = smpp.class_from_pck(pck,"sb_smpp.")
+	cl = smpp.class_from_pck(pck,"sb_smpp_sdk.")
 	print str(cl)
 	
 
