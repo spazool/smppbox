@@ -28,7 +28,7 @@ class socket_bind_client(threading.Thread):
 		
 	
     def recv(self,pck):
-	#print "<<<<<<<<<<<<<<<<<< "+toHexString(pck)
+	print "<<<<<<<<<<<<<<<<<< "+toHexString(pck)
     	if(self.recv_event!=None):
 	    self.recv_event(pck)
 	

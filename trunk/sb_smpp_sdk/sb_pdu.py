@@ -179,7 +179,7 @@ class __sb_generic_nack__(__sb_pdu_header__):
     def __reverce__(self,pck,pdu_header=None):
 	if (pdu_header==None):
 	    pdu_header = __sb_pdu_header__.__reverce__(pck)
-	resp = __sb_unbind__()    
+	resp = __generic_nack__()    
 	resp.__copy__(pdu_header)
 	return resp
 
@@ -193,7 +193,7 @@ class __sb_generic_nack__(__sb_pdu_header__):
 	return self.__head__()+self.__body__()
 
 class __sb_submit_sm_resp__(__sb_pdu_header__):
-    def __init__(self,command_id=smpp_command_id["submit_sm_resp"],smpp_status=smpp_statuses["ESME_ROK"],message_id=0):
+    def __init__(self,command_id=smpp_command_id["submit_sm_resp"],smpp_status=smpp_statuses["ESME_ROK"],message_id=""):
 	self.message_id = message_id
 	__sb_pdu_header__.__init__(self,command_id,smpp_status,0)
 	
@@ -225,7 +225,7 @@ class __sb_submit_sm__(__sb_pdu_header__):
     def __init__(self,service_type="",source_addr_ton=1,source_addr_npi=1,source_addr="",\
     dest_addr_ton=1,dest_addr_npi=1,destination_addr="",esm_class=0x00000000,protocol_id=0,\
     priority_flag=0,schedule_delivery_time="",validity_period="",registered_delivery=0,\
-    replace_if_present_flag=0,data_coding=0x00000000,sm_default_msg_id=0,short_message="",optionals=""):
+    replace_if_present_flag=0,data_coding=0x00000000,sm_default_msg_id=0,short_message="",optionals="",command_id=smpp_command_id["submit_sm"]):
 	self.service_type=service_type
 	self.source_addr_ton=source_addr_ton
 	self.source_addr_npi=source_addr_npi
@@ -245,7 +245,7 @@ class __sb_submit_sm__(__sb_pdu_header__):
 	#self.sm_length=sm_length
 	self.short_message=short_message
 	self.optionals=""
-	__sb_pdu_header__.__init__(self,smpp_command_id["submit_sm"],smpp_statuses["ESME_ROK"],0)
+	__sb_pdu_header__.__init__(self,command_id,smpp_statuses["ESME_ROK"],0)
 	
     def __body__(self):
 	return to_c_octetstring(self.service_type,6)+chr(self.source_addr_ton)+chr(self.source_addr_npi)+to_c_octetstring(self.source_addr,21)+\
@@ -257,13 +257,53 @@ class __sb_submit_sm__(__sb_pdu_header__):
     def __reverce__(self,pck,pdu_header=None):
 	if (pdu_header==None):
 	    pdu_header = __sb_pdu_header__.__reverce__(pck)
-	resp = __sb_unbind__()    
+	pck = pck[16:]
+	print toHexString(pck)
+	resp = __sb_submit_sm__()
+	resp.service_type,pck = get_c_octetstring(pck,6,True)
+	print toHexString(pck)
+	resp.source_addr_ton = ord(pck[0])
+	resp.source_addr_npi = ord(pck[1])
+	resp.source_addr,pck = get_c_octetstring(pck[2:],21,True)
+	print toHexString(pck)
+	resp.dest_addr_ton = ord(pck[0])
+	resp.dest_addr_npi = ord(pck[1])
+	resp.destination_addr,pck = get_c_octetstring(pck[2:],21,True)
+	resp.esm_class = ord(pck[0])
+	resp.protocol_id = ord(pck[1])
+	resp.priority_flag = ord(pck[2])
+	resp.schedule_delivery_time,pck = get_c_octetstring(pck[3:],17,True)
+	resp.validity_period,pck = get_c_octetstring(pck,17,True)
+	resp.registered_delivery = ord(pck[0])
+	resp.replace_if_present_flag = ord(pck[1])
+	resp.data_coding = ord(pck[2])
+	resp.sm_default_msg_id = ord(pck[3])
+	smlen = ord(pck[4])
+	pck = pck[5:]
+	resp.short_message = pck[:smlen]
+	resp.optionals = pck[smlen:]
+	
 	resp.__copy__(pdu_header)
 	return resp
 
     def __str__(self):
 	res = str(__sb_pdu_header__.__str__(self))
 	res += "BODY:\n"
+	res += "\tservice_type:%s\n" % self.service_type
+	res += "\tsource      ton:%d npi:%d addr:[%s]\n" % (self.source_addr_ton,self.source_addr_npi,self.source_addr)
+	res += "\tdestination ton:%d npi:%d addr:[%s]\n" % (self.dest_addr_ton,self.dest_addr_npi,self.destination_addr)
+	res += "\tesm_class:%d (%s)\n" % (self.esm_class,hEX(self.esm_class))
+	res += "\tprotocol_id:%d (%s)\n" % (self.protocol_id ,hEX(self.protocol_id))
+	res += "\tpriority_flag:%d (%s)\n" % (self.priority_flag ,hEX(self.priority_flag))
+	res += "\tschedule_delivery_time:%s\n" % self.schedule_delivery_time
+	res += "\tvalidity_period:%s\n" % self.validity_period
+	res += "\tregistered_delivery:%d (%s)\n" % (self.registered_delivery ,hEX(self.registered_delivery))
+	res += "\treplace_if_present_flag:%d (%s)\n" % (self.replace_if_present_flag ,hEX(self.replace_if_present_flag))
+	res += "\tdata_coding:%d (%s)\n" % (self.data_coding ,hEX(self.data_coding))
+	res += "\tsm_default_msg_id:%d (%s)\n" % (self.sm_default_msg_id ,hEX(self.sm_default_msg_id))
+	res += "\tsm_len:%d\n" % (len(self.short_message))
+	res += "\tshort_message:%s (%s)\n" % (self.short_message,toHexString(self.short_message))
+	res +="\toptionals_hex:%s\n" % toHexString(self.optionals) 
 	res +="\thex:%s" % toHexString(self.__body__()) 
 	return res
  

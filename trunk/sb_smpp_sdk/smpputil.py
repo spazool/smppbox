@@ -41,12 +41,23 @@ def to_c_octetstring(string,lenght):
     else: 
 	return Exception("Lenght error. max(%d)" % lenght)
 
-def get_c_octetstring(string,length=0):
+def get_c_octetstring(pck,length=0,cut=False):
+    res = ""
     if (length > 0):
-	string = string[:length]
+	string = pck[:length]
+
     if (string.find("\x00")==-1):
 	raise Exception("\\x00 not found in C-Octet String")
-    return string[:string.find("\x00")-1]
+    if (string.find("\x00")>0):
+	res = string[:string.find("\x00")]
+	ost = pck[string.find("\x00")+1:]
+    else:
+	res = ""
+	ost = pck[1:]
+    if (cut==True):
+	return res,ost
+    else:
+	return res
 
 def to_c_octetstring_hex(string,lenght):
     string = string.toHexString(string,"")
