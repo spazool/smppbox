@@ -1,4 +1,3 @@
-#labels Deprecated
 #принципиальное описание схемы работы среды messaging-box
 
 = Введение =
