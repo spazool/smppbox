@@ -67,8 +67,39 @@ class deliver_sm_resp(sb_pdu.__sb_submit_sm_resp__):
 	sb_pdu.__sb_submit_sm_resp__.__init__(self,command_id,smpp_status,"")
 
 
-def class_from_pck(pck,path=""):
+def get_command_class(command_id):
+    if (command_id==0x80000103): return data_sm_resp
+    elif (command_id==0x80000002): return bind_transmitter_resp
+    elif (command_id==0x80000009): return bind_transceiver_resp
+    elif (command_id==0x00000002): return bind_transmitter
+    elif (command_id==0x80000021): return submit_multi_resp
+    elif (command_id==0x80000003): return query_sm_resp
+    elif (command_id==0x80000008): return cancel_sm_resp
+    elif (command_id==0x80000006): return unbind_resp
+    elif (command_id==0x00000001): return bind_receiver
+    elif (command_id==0x80000000): return generic_nack
+    elif (command_id==0x00000009): return bind_transceiver
+    elif (command_id==0x00000004): return submit_sm
+    elif (command_id==0x80000007): return replace_sm_resp
+    elif (command_id==0x00000005): return deliver_sm
+    elif (command_id==0x00000102): return alert_notification
+    elif (command_id==0x00000103): return data_sm
+    elif (command_id==0x00000021): return submit_multi
+    elif (command_id==0x00000015): return enquire_link
+    elif (command_id==0x0000000B): return outbind
+    elif (command_id==0x00000008): return cancel_sm
+    elif (command_id==0x00000003): return query_sm
+    elif (command_id==0x00000007): return replace_sm
+    elif (command_id==0x80000004): return submit_sm_resp
+    elif (command_id==0x80000005): return deliver_sm_resp
+    elif (command_id==0x00000006): return unbind
+    elif (command_id==0x80000001): return bind_receiver_resp
+    elif (command_id==0x80000015): return enquire_link_resp
+    else: return generic_nack
+
+def class_from_pck(pck):
     header = sb_pdu.__sb_pdu_header__.__reverce__(pck)
-    return  get_smppclass(get_smppclass_name(header),path).__reverce__(pck,header)
+    cls = get_command_class(header.command_id)
+    return cls.__reverce__(pck,header)
 
 

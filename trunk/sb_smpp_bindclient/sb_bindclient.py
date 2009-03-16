@@ -69,7 +69,7 @@ class socket_bind_transceiver(threading.Thread):
 		self.send(smpp.enquire_link())
 
     def recv(self,pck):
-	cl = smpp.class_from_pck(pck,"sb_smpp_sdk.")
+	cl = smpp.class_from_pck(pck)
 	print "\n----  <<<< Recv ---- <<<<<"
 	print str(cl)
 	if (cl.command_id == smpp_command_id["enquire_link"]):
