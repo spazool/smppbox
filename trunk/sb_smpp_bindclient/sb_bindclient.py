@@ -93,5 +93,4 @@ class socket_bind_transceiver(threading.Thread):
 
     def stop(self):
 	self.bind_client.stop()
-	
-	
+

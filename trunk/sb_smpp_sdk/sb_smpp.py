@@ -12,7 +12,6 @@
 import sb_pdu
 from smpputil import *
 
-
 class bind_transmitter(sb_pdu.__sb_bind__):
     def __init__(self,system_id,password,system_type="cpa",interface_version=0x00000034,addr_ton=0x00,addr_npi=0x00,addr_range=""):
 	sb_pdu.__sb_bind__.__init__(self,system_id,password,system_type,interface_version,addr_ton,addr_npi,addr_range,smpp_command_id["bind_transmitter"])
@@ -55,7 +54,7 @@ class deliver_sm(sb_pdu.__sb_submit_sm__):
     def __init__(self,service_type="",source_addr_ton=1,source_addr_npi=1,source_addr="",\
     dest_addr_ton=1,dest_addr_npi=1,destination_addr="",esm_class=0x00000000,protocol_id=0,\
     priority_flag=0,schedule_delivery_time="",validity_period="",registered_delivery=0,\
-    replace_if_present_flag=0,data_coding=0x00000000,sm_default_msg_id=0,short_message="",optionals="",command_id=smpp_command_id["submit_sm"]):
+    replace_if_present_flag=0,data_coding=0x00000000,sm_default_msg_id=0,short_message="",optionals=[],command_id=smpp_command_id["submit_sm"]):
 	sb_pdu.__sb_submit_sm__.__init__(self,service_type,source_addr_ton,source_addr_npi,source_addr,\
     dest_addr_ton,dest_addr_npi,destination_addr,esm_class,protocol_id,\
     priority_flag,schedule_delivery_time,validity_period,registered_delivery,\
