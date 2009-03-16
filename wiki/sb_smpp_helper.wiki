@@ -1,0 +1,22 @@
+#Надстройка над sb_smpp_sdk для более простого взаимодействия
+
+= Введение =
+
+*sb_smpp_helper* это помошник в работе с sb_smpp_sdk. Он реализует часть методов сильно упрощающих работу при формировании и разборе большинства пакетов.
+
+= Детали =
+
+sb_smpp_helper реализует функционал отправки и получения сообщений, в упрощенном для пользователя формате. Теперь нет необходимости читать документацию по протоколу, helper все сделает за вас. 
+
+= Методы и классы =
+
+*class hlp_smpp()* - реализует все основные настройки соединения и параметры отправки сообщений.
+Конструктор:
+ service_type,source_addr_ton,source_addr_npi,source_addr="",
+ dest_addr_ton=1,dest_addr_npi=1,destination_addr="",esm_class=0x00000000,protocol_id=0,\
+    priority_flag=0,schedule_delivery_time="",validity_period="",registered_delivery=0,\
+    replace_if_present_flag=0,data_coding=0x00000000
+
+
+
+ 
