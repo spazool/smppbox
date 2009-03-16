@@ -1,7 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+# Проект: Средства разработки приложений использующих протокола SMPP 3.4
+#
+# sb_pdu.py -зеализует абстрактные классы  для работы протокола. 
+# 
+# Автор: Дмитрий Высочин
+# Дата: 16.03.2008
+ 
 from smpputil import *
+
 
 ########################################
 # Заголовок пакета
@@ -46,11 +54,13 @@ class __sb_pdu_header__:
 	for c in smpp_command_id:
 	    if (smpp_command_id[c]==self.command_id):
 		self.command_id_text = c
+		break
 
 	for c in smpp_statuses:
 	    if (smpp_statuses[c]==self.command_status_id):
 		self.command_status = c
 		self.command_status_text = smpp_statuses_text[c]
+		break
 
 	res = "HEADER:\n"
 	res+= "\tLenght:%s (%s)\n" % (len(self),hEX(len(self)))
@@ -60,6 +70,8 @@ class __sb_pdu_header__:
 	res+= "\thex:%s\n" % toHexString(self.__head__())
 	return res
 
+
+# Абстрактный класс установки соединения
 class __sb_bind__(__sb_pdu_header__):
     def __init__(self,system_id,password,system_type="cpa",interface_version=0x00000034,addr_ton=0x00,addr_npi=0x00,addr_range="",command_id=smpp_command_id["bind_transceiver"],command_status_id=smpp_statuses["ESME_ROK"],sequence_number=0):
 	self.system_id=system_id
@@ -101,7 +113,7 @@ class __sb_bind__(__sb_pdu_header__):
 	raise Exception("this packet not reversed.")
 	pass
 
-
+# Абстрактный класс ответа установки соединения
 class __sb_bind_resp__(__sb_pdu_header__):
     def __init__(self,system_id,sc_interface_version="",command_id=smpp_command_id["bind_transceiver_resp"]):
 	
@@ -167,7 +179,7 @@ class __sb_custom__(__sb_pdu_header__):
     def pck(self):
 	return self.__head__()+self.__body__()
 
-
+# Пакет ошибки
 class __sb_generic_nack__(__sb_pdu_header__):
     def __init__(self,command_id=smpp_command_id["generic_nack"],smpp_status=smpp_statuses["ESME_ROK"]):
 	__sb_pdu_header__.__init__(self,command_id,smpp_status,0)
@@ -309,3 +321,118 @@ class __sb_submit_sm__(__sb_pdu_header__):
  
     def pck(self):
 	return self.__head__()+self.__body__()
+
+
+
+
+########################################
+# SMPP Optional Parameter Headers
+########################################
+
+class __sb_tlv__():
+    def __init__(self,tag):
+	self.tag = tag
+	self.tag_text = "tlv_reserved"
+	self.tag_text_technology = "Generic"
+    
+    def __len__(self):
+	return len(self.__value__())
+
+    def __str__(self):
+	res ="\tOPTIONAL:\n"
+	
+	for c in smpp_optional_tags:
+	    if (smpp_optional_tags[c]==self.tag):
+		self.tag_text = c
+		self.tag_text_technology = smpp_optional_tags_technology[c]
+		break
+	res+= "\t\tTag:%s (%s), Tech:%s\n" % (self.tag_text,hEX(self.tag,4),self.tag_text_technology)
+	return res
+
+    def __pck__(self):
+	return toWORD(self.tag)+toWORD(self.__len__)+self.__value__()
+
+class __sb_singleint_tlv__(__sb_tlv__):
+    def __init__(self,tag=smpp_optional_tags["tlv_reserved"],value=0):
+	self.value = value
+	__sb_tlv__.__init__(self,tag)
+
+    def __str__(self):
+	res =  __sb_tlv__.__str__(self)
+	ret +="\t\tValue:"+hEX(val,2)+"\n"
+	return res
+
+    def __value__(self):
+	return chr(value)
+
+    @classmethod
+    def __revert__(self,pck,start=0):
+	tag = fromWORD(pck[start:start+2])
+	length = fromWORD(pck[start+2:start+4])
+	value = ord(pck[start+4:start+4+length])
+	return __sb_reserved_tlv__(tag,value)
+
+
+class __sb_doubleint_tlv__(__sb_tlv__):
+    def __init__(self,tag=smpp_optional_tags["tlv_reserved"],value=0):
+	self.value = value
+	__sb_tlv__.__init__(self,tag)
+
+    def __str__(self):
+	res =  __sb_tlv__.__str__(self)
+	ret +="\t\tValue:"+hEX(val,4)+"\n"
+	return res
+
+    def __value__(self):
+	return toWORD(value)
+
+    @classmethod
+    def __revert__(self,pck,start=0):
+	tag = fromWORD(pck[start:start+2])
+	length = fromWORD(pck[start+2:start+4])
+	value = fromWORD(pck[start+4:start+4+length])
+	return __sb_reserved_tlv__(tag,value)
+
+
+class __sb_quadleint_tlv__(__sb_tlv__):
+    def __init__(self,tag=smpp_optional_tags["tlv_reserved"],value=0):
+	self.value = value
+	__sb_tlv__.__init__(self,tag)
+
+    def __str__(self):
+	res =  __sb_tlv__.__str__(self)
+	ret +="\t\tValue:"+hEX(val)+"\n"
+	return res
+
+    def __value__(self):
+	return toDWORD(value)
+
+    @classmethod
+    def __revert__(self,pck,start=0):
+	tag = fromWORD(pck[start:start+2])
+	length = fromWORD(pck[start+2:start+4])
+	value = fromDWORD(pck[start+4:start+4+length])
+	return __sb_reserved_tlv__(tag,value)
+
+
+class __sb_reserved_tlv__(__sb_tlv__):
+    def __init__(self,tag=smpp_optional_tags["tlv_reserved"],value=""):
+	self.value = value
+	__sb_tlv__.__init__(self,tag)
+
+    def __value__(self):
+	return value
+
+    
+    def __str__(self):
+	res =  __sb_tlv__.__str__(self)
+	ret +="\t\tValue:"+toHexString(self.value)+"\n"
+	return res
+
+    @classmethod
+    def __revert__(self,pck,start=0):
+	tag = fromWORD(pck[start:start+2])
+	length = fromWORD(pck[start+2:start+4])
+	value = pck[start+4:start+4+length]
+	return __sb_reserved_tlv__(tag,value)
+	

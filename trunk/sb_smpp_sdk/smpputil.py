@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-######################################
+# Проект: Средства разработки приложений использующих протокола SMPP 3.4
 #
-# Класс с служебными ф-иями
-#
-#####################################
+# sb_smpp.py - Класс с служебными ф-иями и массивами комманд протокола
+# 
+# Автор: Дмитрий Высочин
+# Дата: 16.03.2008
 
 import sys,datetime
 
@@ -67,8 +68,8 @@ def to_c_octetstring_hex(string,lenght):
 	return Exception("Lenght error. max(%d)" % lenght)
 
 
-def hEX(intg):
-    return "0x"+ (hex(intg)[2:].rjust(8,"0")).upper()
+def hEX(intg,cnt=8):
+    return "0x"+ (hex(intg)[2:].rjust(cnt,"0")).upper()
 
 
 def say(text,level=0,group=""):
@@ -252,3 +253,98 @@ smpp_statuses_text["ESME_RMISSINGOPTPARAM"] = "Expected Optional Parameter missi
 smpp_statuses_text["ESME_RINVOPTPARAMVAL"] = "Invalid Optional Parameter Value"
 smpp_statuses_text["ESME_RDELIVERYFAILURE"] = "Delivery   Failure (used for data_sm_resp)"
 smpp_statuses_text["ESME_RUNKNOWNERR"] = "Unknown Error"
+
+smpp_optional_tags = {}
+smpp_optional_tags["tlv_reserved"] = 0x0000
+smpp_optional_tags["dest_addr_subunit"] = 0x0005
+smpp_optional_tags["dest_network_type"] = 0x0006
+smpp_optional_tags["dest_bearer_type"] = 0x0007
+smpp_optional_tags["dest_telematics_id"] = 0x0008
+smpp_optional_tags["source_addr_subunit"] = 0x000D
+smpp_optional_tags["source_network_type"] = 0x000E
+smpp_optional_tags["source_bearer_type"] = 0x000F
+smpp_optional_tags["source_telematics_id"] = 0x0010
+smpp_optional_tags["qos_time_to_live"] = 0x0017
+smpp_optional_tags["payload_type"] = 0x0019
+smpp_optional_tags["additional_status_info_text"] = 0x001D
+smpp_optional_tags["receipted_message_id"] = 0x001E
+smpp_optional_tags["ms_msg_wait_facilities"] = 0x0030
+smpp_optional_tags["privacy_indicator"] = 0x0201
+smpp_optional_tags["source_subaddress"] = 0x0202
+smpp_optional_tags["dest_subaddress"] = 0x0203
+smpp_optional_tags["user_message_reference"] = 0x0204
+smpp_optional_tags["user_response_code"] = 0x0205
+smpp_optional_tags["source_port"] = 0x020A
+smpp_optional_tags["destination_port"] = 0x020B
+smpp_optional_tags["sar_msg_ref_num"] = 0x020C
+smpp_optional_tags["language_indicator"] = 0x020D
+smpp_optional_tags["sar_total_segments"] = 0x020E
+smpp_optional_tags["sar_segment_seqnum"] = 0x020F
+smpp_optional_tags["SC_interface_version"] = 0x0210
+smpp_optional_tags["callback_num_pres_ind"] = 0x0302
+smpp_optional_tags["callback_num_atag"] = 0x0303
+smpp_optional_tags["number_of_messages"] = 0x0304
+smpp_optional_tags["callback_num"] = 0x0381
+smpp_optional_tags["dpf_result"] = 0x0420
+smpp_optional_tags["set_dpf"] = 0x0421
+smpp_optional_tags["ms_availability_status"] = 0x0422
+smpp_optional_tags["network_error_code"] = 0x0423
+smpp_optional_tags["message_payload"] = 0x0424
+smpp_optional_tags["delivery_failure_reason"] = 0x0425
+smpp_optional_tags["more_messages_to_send"] = 0x0426
+smpp_optional_tags["message_state"] = 0x0427
+smpp_optional_tags["ussd_service_op"] = 0x0501
+smpp_optional_tags["display_time"] = 0x1201
+smpp_optional_tags["sms_signal"] = 0x1203
+smpp_optional_tags["ms_validity"] = 0x1204
+smpp_optional_tags["alert_on_message_delivery"] = 0x130C
+smpp_optional_tags["its_reply_type"] = 0x1380
+smpp_optional_tags["its_session_info"] = 0x1383
+
+smpp_optional_tags_technology = {}
+smpp_optional_tags_technology["reserved"] = "Generic"
+smpp_optional_tags_technology["dest_addr_subunit"] = "GSM"
+smpp_optional_tags_technology["dest_network_type"] = "Generic"
+smpp_optional_tags_technology["dest_bearer_type"] = "Generic"
+smpp_optional_tags_technology["dest_telematics_id"] = "GSM"
+smpp_optional_tags_technology["source_addr_subunit"] = "GSM"
+smpp_optional_tags_technology["source_network_type"] = "Generic"
+smpp_optional_tags_technology["source_bearer_type"] = "Generic"
+smpp_optional_tags_technology["source_telematics_id"] = "GSM"
+smpp_optional_tags_technology["qos_time_to_live"] = "Generic"
+smpp_optional_tags_technology["payload_type"] = "Generic"
+smpp_optional_tags_technology["additional_status_info_text"] = "Generic"
+smpp_optional_tags_technology["receipted_message_id"] = "Generic"
+smpp_optional_tags_technology["ms_msg_wait_facilities"] = "GSM"
+smpp_optional_tags_technology["privacy_indicator"] = "CDMA, TDMA"
+smpp_optional_tags_technology["source_subaddress"] = "CDMA, TDMA"
+smpp_optional_tags_technology["dest_subaddress"] = "CDMA, TDMA"
+smpp_optional_tags_technology["user_message_reference"] = "Generic"
+smpp_optional_tags_technology["user_response_code"] = "CDMA, TDMA"
+smpp_optional_tags_technology["source_port"] = "Generic"
+smpp_optional_tags_technology["destination_port"] = "Generic"
+smpp_optional_tags_technology["sar_msg_ref_num"] = "Generic"
+smpp_optional_tags_technology["language_indicator"] = "CDMA, TDMA"
+smpp_optional_tags_technology["sar_total_segments"] = "Generic"
+smpp_optional_tags_technology["sar_segment_seqnum"] = "Generic"
+smpp_optional_tags_technology["SC_interface_version"] = "Generic"
+smpp_optional_tags_technology["callback_num_pres_ind"] = "TDMA"
+smpp_optional_tags_technology["callback_num_atag"] = "TDMA"
+smpp_optional_tags_technology["number_of_messages"] = "CDMA"
+smpp_optional_tags_technology["callback_num"] = "CDMA, TDMA, GSM, iDEN"
+smpp_optional_tags_technology["dpf_result"] = "Generic"
+smpp_optional_tags_technology["set_dpf"] = "Generic"
+smpp_optional_tags_technology["ms_availability_status"] = "Generic"
+smpp_optional_tags_technology["network_error_code"] = "Generic"
+smpp_optional_tags_technology["message_payload"] = "Generic"
+smpp_optional_tags_technology["delivery_failure_reason"] = "Generic"
+smpp_optional_tags_technology["more_messages_to_send"] = "GSM"
+smpp_optional_tags_technology["message_state"] = "Generic"
+smpp_optional_tags_technology["ussd_service_op"] = "GSM (USSD)"
+smpp_optional_tags_technology["display_time"] = "CDMA, TDMA"
+smpp_optional_tags_technology["sms_signal"] = "TDMA"
+smpp_optional_tags_technology["ms_validity"] = "CDMA, TDMA"
+smpp_optional_tags_technology["alert_on_message_delivery"] = "CDMA"
+smpp_optional_tags_technology["its_reply_type"] = "CDMA"
+smpp_optional_tags_technology["its_session_info"] = "CDMA"
+

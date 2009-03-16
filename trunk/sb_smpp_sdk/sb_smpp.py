@@ -1,6 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+# Проект: Средства разработки приложений использующих протокола SMPP 3.4
+#
+# sb_smpp.py - все основные пакеты протокола SMPP 3.4
+# 
+# Автор: Дмитрий Высочин
+# Дата: 16.03.2008
+
+
 import sb_pdu
 from smpputil import *
 
@@ -36,7 +44,7 @@ class enquire_link_resp(sb_pdu.__sb_custom__):
 
 class enquire_link(sb_pdu.__sb_custom__):
     def __init__(self):
-	sb_pdu.__sb_custom__.__init__(self,command_id=smpp_command_id["enquire_link"]) 
+	sb_pdu.__sb_custom__.__init__(self,command_id=smpp_command_id["enquire_link"])
     
 class submit_sm(sb_pdu.__sb_submit_sm__):  pass
 
