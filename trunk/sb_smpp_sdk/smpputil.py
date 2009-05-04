@@ -15,10 +15,8 @@ colors = [ "\x1b\x5b0;%d;49m" % f for f in range(30,38) ] + [ "\x1b\x5b1;%d;49m"
 
 def toDWORD(i):
     return ''.join( map(chr,[x&0xff for x in [i>>24,i>>16,i>>8,i]]))
-    #return ''.join( map(chr,[x&0xff for x in [i,i>>8,i>>16,i>>24]]))
 
 def fromDWORD(s):
-    #return ord(s[0]) + (ord(s[1])<<8) + (ord(s[2])<<16) + (ord(s[3])<<24)
     return ord(s[3]) + (ord(s[2])<<8) + (ord(s[1])<<16) + (ord(s[0])<<24)
 
 def toWORD(i):
@@ -84,32 +82,6 @@ def say(text,level=0,group=""):
     
     sys.stdout.write(unicode(text+"\n","utf-8",errors='replace').encode(output_encoding,"ignore"))
     sys.stdout.flush()
-
-
-# TLV (Tag, Length, Value) format
-#
-#   The Tag field is used to uniquely identify the particular optional parameter in 
-# question. (The optional parameter Tag field is always 2 octets in length.)
-#
-#   The Length field indicates the length of the Value field in octets. Note that this
-# length does not include the length of the Tag and Length fields. (The optional 
-# parameter Length field is always 2 octets in length.)
-#
-# The Value field contains the actual data for the optional parameter in question.
-class TLV:
-    def __init__(self,tag,value):
-	self.tag,self.value = tag,value
-
-    def __len__(self):
-	return len(self.value)
-    
-    def pck(self):
-	return toWORD(tag)+toWORD(len(self))+self.value
-
-    @classmethod
-    def __reverce__(self,pck):
-	return  TLV(fromWORD(pck[2:4]),pck[4:fromWORD(pck[0:2])-4])
-	
 
 smpp_command_id={}
 smpp_command_id["generic_nack"]         = 0x80000000
